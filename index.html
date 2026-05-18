@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesmen & Tes Akademik Peminatan - MA Darul Falah</title>
+    <style>
+        :root {
+            --primary-color: #34495e; 
+            --dark-blue: #1a252f;
+            --green-success: #27ae60;
+            --red-danger: #c0392b;
+            --bg-color: #ecf0f1;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            user-select: none; /* Anti copas soal */
+        }
+
+        .header-banner {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-blue));
+            color: white;
+            text-align: center;
+            padding: 35px 20px;
+        }
+
+        .header-banner h1 { margin: 0; font-size: 24px; text-transform: uppercase; font-weight: 700; }
+
+        .container { max-width: 780px; margin: -20px auto 40px auto; padding: 0 20px; box-sizing: border-box; }
+
+        .card {
+            background: var(--card-bg); padding: 30px; border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; box-sizing: border-box;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--dark-blue); }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 2px solid #bdc3c7; border-radius: 8px; font-size: 16px; }
+
+        .question-box { border-left: 5px solid var(--primary-color); padding-left: 15px; }
+        .section-title {
+            background: var(--dark-blue); color: white; padding: 12px 15px;
+            border-radius: 6px; font-weight: bold; margin: 25px 0 15px 0; font-size: 15px; letter-spacing: 0.5px;
+        }
+
+        .question-text { font-size: 16px; font-weight: 600; color: var(--dark-blue); margin-bottom: 12px; }
+        .options-container { display: flex; flex-direction: column; gap: 8px; }
+        .option-label {
+            display: flex; align-items: center; padding: 11px 14px;
+            background: #f8f9fa; border: 1px solid #dcdde1; border-radius: 6px; cursor: pointer; font-size: 15px;
+        }
+        .option-label:hover { background: #f5f6fa; border-color: var(--primary-color); }
+        input[type="radio"] { margin-right: 10px; transform: scale(1.1); }
+
+        .btn-submit {
+            display: block; width: 100%; padding: 15px; background: var(--primary-color);
+            color: white; border: none; border-radius: 8px; font-size: 17px; font-weight: bold; cursor: pointer;
+        }
+
+        #thank-you-card { display: none; text-align: center; padding: 50px 30px; }
+        .icon-success { font-size: 60px; color: var(--green-success); margin-bottom: 15px; }
+        .icon-cheat { font-size: 60px; color: var(--red-danger); margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="header-banner">
+    <h1>Asesmen Komparatif & Tes Peminatan Kelas 11</h1>
+    <p>MA Darul Falah Ponorogo</p>
+</div>
+
+<div class="container">
+    <!-- DATA REGISTRASI -->
+    <div id="auth-card" class="card">
+        <h3 style="margin-top:0; color: var(--dark-blue); text-align: center;">Identifikasi Santri</h3>
+        <div class="form-group">
+            <label for="nama">Nama Lengkap:</label>
+            <input type="text" id="nama" placeholder="Masukkan nama lengkap" required>
+        </div>
+        <div class="form-group">
+            <label for="kelas">Kelas Saat Ini:</label>
+            <select id="kelas" required>
+                <option value="">-- Pilih Rombel --</option>
+                <option value="10 Putra">10 Putra</option>
+                <option value="10 Putri">10 Putri</option>
+            </select>
+        </div>
+        <div style="background: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; font-size: 13px; margin-bottom: 20px; font-weight: 600; border-left: 4px solid #ffc107;">
+            ⚠️ PROTOKOL KEAMANAN AKADEMIK: Halaman ini terkunci otomatis jika Anda berpindah aplikasi, membuka tab browser baru, atau mencari jawaban di Google/Internet sebanyak 3 kali. Jika terblokir, status pengerjaan Anda otomatis dilaporkan dengan catatan khusus kecurangan.
+        </div>
+        <button class="btn-submit" onclick="startQuiz()">Verifikasi data & Mulai Tes</button>
+    </div>
+
+    <!-- FORMAT LEMBAR SOAL UTUH -->
+    <form id="quiz-form" style="display: none;">
+        <div class="section-title">BAGIAN A: ASESMEN MINAT BAKAT & MINAT PENJURUSAN</div>
+        <div id="questions-minat"></div>
+
+        <div class="section-title">BAGIAN B: INSTANSI TES AKADEMIK KOMPETENSI MIPA</div>
+        <div id="questions-ipa"></div>
+
+        <div class="section-title">BAGIAN C: INSTANSI TES AKADEMIK KOMPETENSI SOSIAL (IPS)</div>
+        <div id="questions-ips"></div>
+
+        <button type="submit" class="btn-submit" style="background-color: var(--green-success); margin-top: 20px;">Kunci Jawaban & Kirim ke Kurikulum</button>
+    </form>
+
+    <!-- RESPONSE SCREEN SELESAI SENGATAN NORMAL -->
+    <div id="thank-you-card" class="card">
+        <div class="icon-success">✔</div>
+        <h2>Alhamdulillah, Selesai!</h2>
+        <p style="font-size: 16px; color: #555;">Instrumen penjurusan dan nilai kompetensi akademik 41 butir soal Anda telah aman tersimpan di pangkalan data madrasah.</p>
+        <p style="font-weight: bold; color: var(--green-success);">Silakan tutup halaman tab ini. Terima kasih atas kejujurannya!</p>
+    </div>
+
+    <!-- RESPONSE SCREEN JIKA TERBLOKIR DOSA NYONTEK -->
+    <div id="blocked-card" class="card" style="display: none; text-align: center; padding: 50px 30px;">
+        <div class="icon-cheat">❌</div>
+        <h2 style="color: var(--red-danger);">AKSES TES RESMI DIKUNCI PERMANEN</h2>
+        <p style="font-size: 16px; color: #555;">Anda terdeteksi melanggar pakta integritas ujian dengan sengaja meninggalkan halaman pengerjaan sebanyak 3 kali.</p>
+        <p style="font-weight: bold; color: var(--red-danger);">Sistem telah membekukan lembar jawaban Anda dan melabeli nama Anda dengan status maladministrasi (CURANG).</p>
+    </div>
+</div>
+
+<script>
+    // Total 41 Soal Ganjil (15 Minat, 13 Akademik IPA, 13 Akademik IPS)
+    const bankSoal = [
+        // ==================== I. MINAT (15 SOAL) ====================
+        { q: "1. Topik bacaan artikel sains/sosial manakah yang paling spontan memicu rasa penasaran Anda?", o: ["Mekanika kuantum, rekayasa genetika tanaman, atau rahasia blackhole", "Kebijakan geopolitik dunia, dinamika sosiologi perkotaan, atau analisis pasar modal"], cat: "M", ipaPoin: 1, ipsPoin: 0 },
+        { q: "2. Di antara dua jenis tugas riset mini madrasah berikut, mana yang paling Anda nikmati?", o: ["Melakukan eksperimen uji asam-basa zat atau membedah anatomi makhluk hidup", "Membuat esai pengamatan interaksi sosial masyarakat atau sejarah asal-usul desa"], cat: "M", ipaPoin: 0, ipsPoin: 1 },
+        { q: "3. Jika Anda diberi kesempatan emas magang kerja serasi profesi, posisi mana yang Anda pilih?", o: ["Dokter spesialis, Insinyur teknik sipil, Ahli Mikrobiologi, atau praktisi software AI", "Akuntan publik keuangan, Hakim pengadilan, Diplomat luar negeri, atau Sosiolog lapangan"], cat: "M", ipaPoin: 1, ipsPoin: 0 },
+        { q: "4. Bagaimana pendekatan berpikir yang paling cocok untuk Anda dalam mengurai problem rumit?", o: ["Menggunakan susunan variabel angka pasti logika eksak dan pembuktian rumus logis", "Menganalisis hubungan sebab-akibat psikologis perilaku manusia dan tatanan hukum"], cat: "M", ipaPoin: 0, ipsPoin: 1 },
+        { q: "5. Stand pameran kampus jurusan kuliah manakah yang paling ingin Anda singgahi pertama kali?", o: ["Fakultas Teknik Mesin/Kimia, Fakultas Kedokteran, atau Fakultas MIPA Astronomi", "Fakultas Hukum Tata Negara, Fakultas Ekonomi Akuntansi, atau Hubungan Internasional"], cat: "M", ipaPoin: 1, ipsPoin: 0 },
+        { q: "6. Saat melihat berita pembangunan pabrik industri besar, apa fokus pikiran yang terlintas?", o: ["Sistem pembuangan limbah sisa zat kimia berbahaya dan efisiensi mesin produksi", "Dampak penyerapan tenaga kerja lokal, konflik sosiologi warga, dan inflasi ekonomi"], cat: "M", ipaPoin: 1, ipsPoin: 0 },
+        { q: "7. Jenis aktivitas praktikum/belajar mandiri kelompok manakah yang membuat waktu terasa cepat berlalu?", o: ["Mencari penyelesaian soal kalkulus matematika jlimet atau menyusun rangkaian listrik", "Berdiskusi mencari akar masalah inflasi keuangan atau menganalisis kasus sengketa hukum"], cat: "M", ipaPoin: 1, ipsPoin: 0 },
+        { q: "8. Jika diminta membuat konten video edukasi di media sosial, tema mana yang lebih seru diulik?", o: ["Penjelasan rumus fisika dalam fenomena sehari-hari atau tips coding sederhana", "Review buku biografi tokoh pahlawan dunia atau analisis fenomena tren sosial anak muda"], cat: "M", ipaPoin: 0, ipsPoin: 1 },
+        { q: "9. Di antara dua hobi alternatif pengisi waktu luang ini, mana yang cenderung menarik minat Anda?", o: ["Membaca buku ensiklopedia flora-fauna atau bermain game simulasi strategi logika", "Membaca novel fiksi sejarah, berita politik korupsi, atau menulis catatan opini publik"], cat: "M", ipaPoin: 0, ipsPoin: 1 },
+        { q: "10. Manakah dari sifat pribadi berikut yang paling menggambarkan diri Anda ketika belajar?", o: ["Sangat suka bekerja dengan data angka riil, eksperimen fisik, dan analisis terstruktur", "Suka mengamati pola interaksi manusia, membaca narasi teks panjang, serta berdiskusi"], cat: "M", ipaPoin: 1, ipsPoin: 0 },
+        { q: "11. Bila terjadi fenomena perubahan iklim global ekstrem, sudut pandang mana yang ingin Anda teliti?", o: ["Analisis kerusakan lapisan ozon kimia atmosfer bumi dan curah hujan meteorologi", "Perubahan pola adaptasi mata pencaharian petani dan ancaman krisis pangan sosial"], cat: "M", ipaPoin: 1, ipsPoin: 0 },
+        { q: "12. Bentuk ujian sekolah seperti apa yang paling membuat Anda merasa potensial optimal Anda keluar?", o: ["Ujian hitungan rumus eksak pasti atau pilihan ganda penalaran logika visual/grafik", "Ujian esai narasi panjang analisis argumen, pendapat kritis, atau kasus sosiologis"], cat: "M", ipaPoin: 0, ipsPoin: 1 },
+        { q: "13. Tokoh idola dunia legendaris manakah yang rekam jejak karyanya lebih menginspirasi Anda?", o: ["Albert Einstein, Isaac Newton, BJ Habibie, atau Thomas Alva Edison", "Ir. Soekarno, Adam Smith, Mohammad Hatta, atau Ibnu Khaldun"], cat: "M", ipaPoin: 1, ipsPoin: 0 },
+        { q: "14. Masalah lingkungan perkotaan berupa kemacetan parah membuat Anda tertarik mengkaji dari segi...", o: ["Desain tata ruang transportasi kota berbasis teknologi AI otomatisasi jalur logistik", "Karakter kepatuhan hukum pengendara serta sosiologi mobilitas kaum urban urbanisasi"], cat: "M", ipaPoin: 0, ipsPoin: 1 },
+        { q: "15. Apa aspek utama pelajaran di kelas yang paling mudah terserap di ingatan memori otak Anda?", o: ["Konsep rumus baku, simbol elemen unsur kimiawi, dan grafik alur pembuktian fisis", "Kisah rentetan tahun sejarah, teori perubahan sosial antropologi, dan sistem pasar"], cat: "M", ipaPoin: 0, ipsPoin: 1 },
+
+        // ==================== II. AKADEMIK IPA (13 SOAL) ====================
+        { q: "16. (AKADEMIK MIPA) Diketahui fungsi $f(x) = 3x - 5$. Berapakah nilai dari fungsi invers $f^{-1}(4)$?", o: ["3", "1", "7", "12"], cat: "IPA", kunci: 0 },
+        { q: "17. (AKADEMIK MIPA) Sebuah mobil bermassa 1000 kg melaju dengan kecepatan konstan 10 m/s. Berapakah nilai Energi Kinetik yang dimiliki mobil tersebut?", o: ["5.000 Joule", "10.000 Joule", "50.000 Joule", "100.000 Joule"], cat: "IPA", kunci: 2 },
+        { q: "18. (AKADEMIK MIPA) Unsur dengan konfigurasi elektron terluar berakhiran pada $3s^2 3p^5$ terletak pada golongan...", o: ["V A", "VII A (Halogen)", "III A", "VIII A (Gas Mulia)"], cat: "IPA", kunci: 1 },
+        { q: "19. (AKADEMIK MIPA) Jaringan tumbuhan yang sel-selnya aktif melakukan pembelahan diri secara mitosis untuk pertumbuhan memanjang dinamakan...", o: ["Jaringan Meristem", "Jaringan Epidermis", "Jaringan Parenkim", "Jaringan Sklerenkim"], cat: "IPA", kunci: 0 },
+        { q: "20. (AKADEMIK MIPA) Berapakah hasil penyederhanaan dari nilai matematika $\log 2 + \log 50$?", o: ["$\log 52$", "2", "5", "1"], cat: "IPA", kunci: 1 },
+        { q: "21. (AKADEMIK MIPA) Sifat koligatif larutan yang dimanfaatkan dalam proses pembuatan es putar tradisional menggunakan garam dapur adalah...", o: ["Kenaikan titik didih", "Tekanan osmotik", "Penurunan titik beku", "Penurunan tekanan uap"], cat: "IPA", kunci: 2 },
+        { q: "22. (AKADEMIK MIPA) Organ manusia yang berfungsi mengekskresikan zat sisa metabolisme berupa urea, air, dan garam mineral dari dalam darah adalah...", o: ["Paru-paru", "Ginjal", "Hati", "Jantung"], cat: "IPA", kunci: 1 },
+        { q: "23. (AKADEMIK MIPA) Berapakah besar kuat arus listrik total (I) yang mengalir pada rangkaian jika tegangan baterai 12 Volt dipasang pada hambatan listrik sebesar 4 Ohm?", o: ["3 Ampere", "48 Ampere", "0.33 Ampere", "16 Ampere"], cat: "IPA", kunci: 0 },
+        { q: "24. (AKADEMIK MIPA) Senyawa hidrokarbon alkana yang memiliki jumlah atom karbon sebanyak 3 ($C_3H_8$) diberi nama senyawa...", o: ["Metana", "Etana", "Propana", "Butana"], cat: "IPA", kunci: 2 },
+        { q: "25. (AKADEMIK MIPA) Hukum Mendel I tentang pewarisan sifat makhluk hidup dikenal luas dengan sebutan asas/hukum...", o: ["Segregasi secara bebas", "Asortasi secara bebas", "Dominansi penuh", "Interaksi gen"], cat: "IPA", kunci: 0 },
+        { q: "26. (AKADEMIK MIPA) Jika turunan pertama fungsi $f(x) = 2x^3 - 4x$, maka nilai dari turunan berderajat satu $f'(x)$ adalah...", o: ["$6x^2 - 4$", "$2x^2 - 4$", "$6x - 4$", "$3x^2$"], cat: "IPA", kunci: 0 },
+        { q: "27. (AKADEMIK MIPA) Suatu zat pengompleks warna biru lakmus berubah menjadi warna merah mengindikasikan bahwa sifat larutan tersebut adalah...", o: ["Basa kuat", "Netral murni", "Asam", "Basa lemah"], cat: "IPA", kunci: 2 },
+        { q: "28. (AKADEMIK MIPA) Vektor pembawa (vektor penyakit) yang mentransmisikan mikroorganisme parasit Plasmodium penyebab penyakit Malaria adalah nyamuk...", o: ["Aedes aegypti", "Anopheles betina", "Culex", "Mansonia"], cat: "IPA", kunci: 1 },
+
+        // ==================== III. AKADEMIK IPS (13 SOAL) ====================
+        { q: "29. (AKADEMIK IPS) Fenomena penyesuaian budaya lokal asli dengan kebudayaan asing yang saling melebur menghasilkan kebudayaan baru tanpa menghilangkan ciri lama disebut...", o: ["Asimilasi", "Akulturasi", "Amalgamasi", "Segmentasi"], cat: "IPS", kunci: 1 },
+        { q: "30. (AKADEMIK IPS) Hukum permintaan dalam ilmu ekonomi menyatakan bahwa apabila harga suatu barang mengalami kenaikan, maka...", o: ["Jumlah barang yang diminta akan naik", "Jumlah barang yang diminta akan turun", "Jumlah barang yang ditawarkan tetap", "Jumlah penawaran anjlok gratis"], cat: "IPS", kunci: 1 },
+        { q: "31. (AKADEMIK IPS) Sumber sejarah primer tertulis kuno berwujud media batu pahatan yang merekam sejarah kerajaan-kerajaan awal di nusantara disebut...", o: ["Serat", "Prasasti", "Babad", "Kronik"], cat: "IPS", kunci: 1 },
+        { q: "32. (AKADEMIK IPS) Letak astronomis Indonesia yang berada di lintas garis ekuator menyebabkan wilayah nusantara didominasi oleh karakteristik iklim...", o: ["Subtropis", "Tropis", "Muson dingin", "Gurun kering"], cat: "IPS", kunci: 1 },
+        { q: "33. (AKADEMIK IPS) Norma sosial yang memiliki sanksi paling tegas, mengikat, resmi, dan tertulis dalam lembaran negara berupa hukuman kurungan adalah...", o: ["Norma Agama", "Norma Hukum", "Norma Kesusilaan", "Norma Kesopanan"], cat: "IPS", kunci: 1 },
+        { q: "34. (AKADEMIK IPS) Inflasi yang disebabkan oleh lonjakan drastis biaya produksi faktor barang sehingga harga barang jadi ikut melambung naik di pasar disebut...", o: ["Demand-pull inflation", "Cost-push inflation", "Hyperinflation", "Domestic inflation"], cat: "IPS", kunci: 1 },
+        { q: "35. (AKADEMIK IPS) Pembagian kerja sama internasional melalui wadah organisasi persemakmuran negara di wilayah Asia Tenggara dinamakan...", o: ["APEC", "ASEAN", "OPEC", "MEE"], cat: "IPS", kunci: 1 },
+        { q: "36. (AKADEMIK IPS) Pergerakan lempeng tektonik bumi yang saling bertumbukan satu sama lain berpotensi kuat memicu bencana alam fisis yaitu...", o: ["Gempa bumi tektonik dan tsunami", "Angin puting beliung", "Kekeringan meteorologis", "Tanah amblas abrasi"], cat: "IPS", kunci: 0 },
+        { q: "37. (AKADEMIK IPS) Sistem pelapisan struktur sosial masyarakat yang membagi kedudukan warga berdasarkan kasta tertutup kaku (tidak bisa pindah) dinamakan...", o: ["Stratifikasi sosial terbuka", "Stratifikasi sosial tertutup", "Diferensiasi sosial", "Konsolidasi sosial"], cat: "IPS", kunci: 1 },
+        { q: "38. (AKADEMIK IPS) Badan usaha ekonomi yang seluruh atau sebagian besar modal kepemilikannya bersumber langsung dari aset kekayaan negara disebut...", o: ["BUMS", "BUMN", "Koperasi", "Firma"], cat: "IPS", kunci: 1 },
+        { q: "39. (AKADEMIK IPS) Perang Dunia II di kawasan wilayah Asia-Pasifik secara resmi berakhir setelah terjadinya peristiwa bersejarah yaitu...", o: ["Pengeboman kota Hiroshima & Nagasaki oleh Sekutu", "Jatuhnya kota Berlin ke tangan tentara Uni Soviet", "Penandatanganan Perjanjian Versailles", "Kekalahan pasukan Jerman di El Alamein"], cat: "IPS", kunci: 0 },
+        { q: "40. (AKADEMIK IPS) Batuan yang terbentuk langsung dari hasil pembekuan materi magma atau lava cair gunung berapi yang mendingin dinamakan...", o: ["Batuan Sedimen", "Batuan Beku", "Batuan Metamorf", "Batuan Malihan"], cat: "IPS", kunci: 1 },
+        { q: "41. (AKADEMIK IPS) Tindakan kriminalitas pencurian di komplek perumahan merupakan bentuk perilaku menyimpang yang disebabkan gagalnya fungsi lembaga...", o: ["Lembaga Agama", "Lembaga Keluarga & Pengendalian Sosial", "Lembaga Politik", "Lembaga Ekonomi"], cat: "IPS", kunci: 1 }
+    ];
+
+    let cheatCount = 0;
+    let quizStarted = false;
+
+    // FITUR DETEKSI CURANG (ANTI BROWSING)
+    window.addEventListener('blur', function() {
+        if (!quizStarted) return;
+        
+        cheatCount++;
+        if (cheatCount >= 3) {
+            autoBlockSystem();
+        } else {
+            alert(`⚠️ DETEKSI PELANGGARAN TAB!\nAnda terpantau meninggalkan browser ujian.\nBatas toleransi tersisa: ${3 - cheatCount} kali lagi. Jika melanggar lagi, lembar tes OTOMATIS DIKUNCI MASAL!`);
+        }
+    });
+
+    function startQuiz() {
+        const nama = document.getElementById('nama').value.trim();
+        const kelas = document.getElementById('kelas').value;
+        if(!nama || !kelas) {
+            alert("Harap isi nama dan pilih kelas terlebih dahulu!");
+            return;
+        }
+
+        quizStarted = true;
+        document.getElementById('auth-card').style.display = 'none';
+        document.getElementById('quiz-form').style.display = 'block';
+
+        const containerMinat = document.getElementById('questions-minat');
+        const containerIpa = document.getElementById('questions-ipa');
+        const containerIps = document.getElementById('questions-ips');
+        
+        containerMinat.innerHTML = "";
+        containerIpa.innerHTML = "";
+        containerIps.innerHTML = "";
+
+        bankSoal.forEach((soal, i) => {
+            const box = document.createElement('div');
+            box.className = 'card question-box';
+            
+            let optionsHtml = "";
+            soal.o.forEach((opt, idx) => {
+                optionsHtml += `
+                    <label class="option-label">
+                        <input type="radio" name="peminatan_${i}" value="${idx}" required>
+                        ${soal.cat === 'M' ? opt : String.fromCharCode(65 + idx) + '. ' + opt}
+                    </label>
+                `;
+            });
+
+            box.innerHTML = `
+                <div class="question-text">${soal.q}</div>
+                <div class="options-container">${optionsHtml}</div>
+            `;
+
+            if(soal.cat === "M") {
+                containerMinat.appendChild(box);
+            } else if(soal.cat === "IPA") {
+                containerIpa.appendChild(box);
+            } else if(soal.cat === "IPS") {
+                containerIps.appendChild(box);
+            }
+        });
+        window.scrollTo(0,0);
+    }
+
+    function kirimKeGoogleSheets(statusKecurangan) {
+        let totalPoinIPA = 0;
+        let totalPoinIPS = 0;
+
+        bankSoal.forEach((soal, i) => {
+            const selected = document.querySelector(`input[name="peminatan_${i}"]:checked`);
+            if(selected) {
+                const nilaiPilihan = parseInt(selected.value);
+                if(soal.cat === "M") {
+                    if(soal.ipaPoin === 1 && nilaiPilihan === 0) totalPoinIPA++;
+                    if(soal.ipsPoin === 1 && nilaiPilihan === 1) totalPoinIPS++;
+                } else {
+                    if(nilaiPilihan === soal.kunci) {
+                        if(soal.cat === "IPA") totalPoinIPA++;
+                        if(soal.cat === "IPS") totalPoinIPS++;
+                    }
+                }
+            }
+        });
+
+        const nama = document.getElementById('nama').value;
+        const kelas = document.getElementById('kelas').value;
+        
+        let hasilRekomendasi = totalPoinIPA > totalPoinIPS ? "MIPA (IPA)" : "IPS";
+        let selisihMaksimal = 28; // Maks poin IPA/IPS jika betul seluruhnya (5 minat + 13 akademik)
+        let persenDominan = totalPoinIPA > totalPoinIPS ? Math.round((totalPoinIPA / selisihMaksimal) * 100) : Math.round((totalPoinIPS / selisihMaksimal) * 100);
+        let persentaseTeks = `${persenDominan}% Dominasi ${hasilRekomendasi}`;
+
+        // =========================================================
+        // https://script.google.com/macros/s/AKfycbw9yiBPo0_10iN8iCNlGEO7Ey4EH2WJd25AuLi3UyBhaKX2cB0VAFZrrHhlQH6zhjWDag/exec
+        // =========================================================
+        const urlGoogleSheetsBaru = "https://script.google.com/macros/s/AKfycbw9yiBPo0_10iN8iCNlGEO7Ey4EH2WJd25AuLi3UyBhaKX2cB0VAFZrrHhlQH6zhjWDag/exec";
+
+        const dataKirim = {
+            nama: nama,
+            kelas: kelas,
+            skor_ipa: totalPoinIPA + " Poin",
+            skor_ips: totalPoinIPS + " Poin",
+            persentase: persentaseTeks,
+            rekomendasi: hasilRekomendasi,
+            catatan: statusKecurangan
+        };
+
+        fetch(urlGoogleSheetsBaru, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dataKirim)
+        });
+    }
+
+    // SUBMIT SUKSES NORMAL
+    document.getElementById('quiz-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        quizStarted = false;
+        
+        let statusKejujuran = cheatCount > 0 ? `JUJUR (Pindah tab ${cheatCount}x)` : "SANGAT JUJUR (Fokus pengerjaan)";
+        kirimKeGoogleSheets(statusKejujuran);
+
+        document.getElementById('quiz-form').style.display = 'none';
+        document.getElementById('thank-you-card').style.display = 'block';
+        window.scrollTo(0,0);
+    });
+
+    // LOCK SYSTEM JIKA CURANG NYONTEK 3 KALI
+    function autoBlockSystem() {
+        quizStarted = false;
+        
+        kirimKeGoogleSheets("⚠️ TERDETEKSI CURANG (Kunci Paksa 3x Pindah Tab)");
+
+        document.getElementById('quiz-form').style.display = 'none';
+        document.getElementById('auth-card').style.display = 'none';
+        document.getElementById('blocked-card').style.display = 'block';
+        window.scrollTo(0,0);
+    }
+</script>
+</body>
+</html>
